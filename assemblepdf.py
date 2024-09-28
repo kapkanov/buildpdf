@@ -14,33 +14,50 @@ images = []
 pdfs   = []
 currow = 1
 
-root   = Tk()
+
+root      = Tk()
 root.title("Assemble PDF")
-frame  = ttk.Frame(root)
-frame.pack()
+canvas    = Canvas(root, borderwidth=0)
+frame     = ttk.Frame(canvas)
+scrollbar = ttk.Scrollbar(
+              root,
+              orient="vertical",
+              command=canvas.yview
+            )
+canvas.configure(yscrollcommand=scrollbar.set)
+scrollbar.pack(side="right", fill="y")
+canvas.pack(side="left", fill="both", expand=True)
 
+
+def update_scrollregion():
+  canvas.configure(scrollregion=canvas.bbox("all"))
+
+
+frame.bind("<Configure>", lambda _: update_scrollregion())
+canvas.create_window((19,4), window=frame, anchor="nw")
 parent = frame
-
 
 def add_element(element):
   element.pack()
 
 
 def reload_frame():
-  # for child in frame.winfo_children():
-  #   child.destroy()
-  # swin = ScrolledWindow(parent, width=500, height=500)
-  # swin.grid()
-  # win  = swin.window
+  for child in parent.winfo_children():
+    child.destroy()
+  button = ttk.Button(parent, text="+", command=open_file)
+  add_element(button)
   for img in images:
     load_image(img)
 
 
 def load_image(img):
-  img         = img.resize((300,300))
-  imgtk       = ImageTk.PhotoImage(img)
-  panel       = ttk.Label(parent, image=imgtk)
-  panel.image = imgtk
+  width, height = img.size
+  width         = int(300 * width / height)
+  height        = 300
+  img           = img.resize((width,height))
+  imgtk         = ImageTk.PhotoImage(img)
+  panel         = ttk.Label(parent, image=imgtk)
+  panel.image   = imgtk
   add_element(panel)
 
 
@@ -54,8 +71,7 @@ def load_fimage(filename):
 
 
 def pdf2img(filename):
-  global buffer
-  img    = []
+  img = []
   for page in pymupdf.open(filename):
     pixmap = page.get_pixmap()
     buffer.append(io.BytesIO(pixmap.tobytes()))
@@ -84,7 +100,8 @@ def open_file():
   reload_frame()
 
 
-button = ttk.Button(parent, text="+", command=open_file)
-add_element(button)
+reload_frame()
+# button = ttk.Button(parent, text="+", command=open_file)
+# button.pack()
 
 root.mainloop()
