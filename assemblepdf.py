@@ -33,11 +33,21 @@ scrollbar.pack(side="right", fill="y")
 canvas.pack(side="left", fill="both", expand=True)
 
 
-def update_scrollregion(*args):
+def update_canvas(*args):
+  global wcanvas
+  global hcanvas
+  wcanvas = canvas.winfo_width()
+  hcanvas = canvas.winfo_height()
+  reload_frame()
+
+canvas.bind("<Configure>", update_canvas)
+
+def update_mainframe(*args):
+  global canvas
   canvas.configure(scrollregion=canvas.bbox("all"))
 
 
-frame.bind("<Configure>", update_scrollregion)
+frame.bind("<Configure>", update_mainframe)
 canvas.create_window((int((wcanvas - 640) / 2),0), window=frame, anchor="nw")
 parent = frame
 
