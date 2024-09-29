@@ -16,7 +16,8 @@ pdfs    = []
 currow  = 1
 wcanvas = 800
 hcanvas = 600
-wimages = 300
+himages = 300
+maxw    = 100
 
 root      = Tk()
 root.title("Assemble PDF")
@@ -37,7 +38,7 @@ def update_scrollregion(*args):
 
 
 frame.bind("<Configure>", update_scrollregion)
-canvas.create_window((int((wcanvas-wimages)/2),0), window=frame, anchor="nw")
+canvas.create_window((int((wcanvas - 640) / 2),0), window=frame, anchor="nw")
 parent = frame
 
 
@@ -46,6 +47,9 @@ def add_element(element):
 
 
 def reload_frame():
+  global canvas
+  global frame
+  canvas.delete("all")
   for child in parent.winfo_children():
     child.destroy()
   button_frame  = ttk.Frame(parent)
@@ -54,12 +58,16 @@ def reload_frame():
   add_element(ttk.Button(button_frame, text="Export", command=export))
   for img in images:
     load_image(img)
+  canvas.create_window((int((wcanvas - maxw) / 2),0), window=frame, anchor="nw")
 
 
 def load_image(img):
+  global maxw
   width, height = img.size
-  height        = int(wimages * height / width)
-  width         = wimages
+  width         = int(300 * width / height)
+  height        = 300
+  if width > maxw:
+    maxw = width
   img           = img.resize((width,height))
   imgtk         = ImageTk.PhotoImage(img)
   panel         = ttk.Label(parent, image=imgtk)
@@ -78,6 +86,7 @@ def pdf2img(filename):
     pixmap = page.get_pixmap()
     buffer.append(io.BytesIO(pixmap.tobytes()))
     img.append(Image.open(buffer[-1]))
+    width, _ = img[-1].size
   return img
 
 
@@ -108,9 +117,6 @@ def open_file():
   if extension == ".pdf":
     images += pdf2img(filename)
     pdfs   += split_pdf(filename)
-    # for doc in pdfs:
-    #   for page in doc.pages():
-    #     print(page)
   elif extension == ".jpg" \
   or   extension == ".jpeg" \
   or   extension == ".png" \
@@ -121,8 +127,6 @@ def open_file():
     doc        = pymupdf.Document()
     doc.new_page(pno=-1, width=wimg, height=himg)
     rect       = pymupdf.Rect(0, 0, wimg, himg)
-    # with f as open(filename, "rb"):
-    #   bimg = f.read()
     page = doc.load_page(0)
     page.insert_image(rect, filename=filename)
     images.append(img)
