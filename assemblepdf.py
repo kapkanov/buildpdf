@@ -17,12 +17,12 @@ currow  = 1
 wcanvas = 800
 hcanvas = 600
 himages = 300
-maxw    = 100
+maxw    = 150
 
 root      = Tk()
 root.title("Assemble PDF")
 canvas    = Canvas(root, width=wcanvas, height=hcanvas)
-frame     = ttk.Frame(canvas)
+mainframe = ttk.Frame(canvas)
 scrollbar = ttk.Scrollbar(
               root,
               orient="vertical",
@@ -38,27 +38,29 @@ def update_canvas(*args):
   global hcanvas
   wcanvas = canvas.winfo_width()
   hcanvas = canvas.winfo_height()
-  reload_frame()
+  canvas.delete("all")
+  canvas.create_window((int((wcanvas - maxw) / 2),0), window=mainframe, anchor="nw")
 
 canvas.bind("<Configure>", update_canvas)
+
 
 def update_mainframe(*args):
   global canvas
   canvas.configure(scrollregion=canvas.bbox("all"))
 
 
-frame.bind("<Configure>", update_mainframe)
-canvas.create_window((int((wcanvas - 640) / 2),0), window=frame, anchor="nw")
-parent = frame
+mainframe.bind("<Configure>", update_mainframe)
+canvas.create_window((int((wcanvas - maxw) / 2),0), window=mainframe, anchor="nw")
+parent = mainframe
 
 
 def add_element(element):
   element.pack()
 
 
-def reload_frame():
+def reload_mainframe():
   global canvas
-  global frame
+  global mainframe
   canvas.delete("all")
   for child in parent.winfo_children():
     child.destroy()
@@ -68,7 +70,7 @@ def reload_frame():
   add_element(ttk.Button(button_frame, text="Export", command=export))
   for img in images:
     load_image(img)
-  canvas.create_window((int((wcanvas - maxw) / 2),0), window=frame, anchor="nw")
+  canvas.create_window((int((wcanvas - maxw) / 2),0), window=mainframe, anchor="nw")
 
 
 def load_image(img):
@@ -83,11 +85,6 @@ def load_image(img):
   panel         = ttk.Label(parent, image=imgtk)
   panel.image   = imgtk
   add_element(panel)
-
-
-def load_fimage(filename):
-  img = Image.open(filename)
-  load_image(img)
 
 
 def pdf2img(filename):
@@ -115,6 +112,17 @@ def split_pdf(filename):
   return pages
 
 
+def img2pdf(filename):
+    img        = Image.open(filename)
+    wimg, himg = img.size
+    doc        = pymupdf.Document()
+    doc.new_page(pno=0, width=wimg, height=himg)
+    rect       = pymupdf.Rect(0, 0, wimg, himg)
+    page       = doc.load_page(0)
+    page.insert_image(rect, filename=filename)
+    return doc
+
+
 def open_file():
   global images
   global pdfs
@@ -132,27 +140,21 @@ def open_file():
   or   extension == ".png" \
   or   extension == ".gif" \
   or   extension == ".bmp":
-    img        = Image.open(filename)
-    wimg, himg = img.size
-    doc        = pymupdf.Document()
-    doc.new_page(pno=-1, width=wimg, height=himg)
-    rect       = pymupdf.Rect(0, 0, wimg, himg)
-    page = doc.load_page(0)
-    page.insert_image(rect, filename=filename)
-    images.append(img)
-    pdfs.append(doc)
+    images.append(Image.open(filename))
+    pdfs.append(img2pdf(filename))
   else:
     ttk.Label(parent, text=f"Garbage! {extension}").pack()
-  reload_frame()
+  reload_mainframe()
 
 
 def export(*args):
-  filename = filedialog.asksaveasfilename()
+  ext      = [("pdf", "*.pdf")]
+  filename = filedialog.asksaveasfilename(filetypes=ext, defaultextension=ext)
   doc      = pymupdf.Document()
   for page in pdfs:
     doc.insert_pdf(page)
   doc.save(filename)
 
-reload_frame()
+reload_mainframe()
 
 root.mainloop()
