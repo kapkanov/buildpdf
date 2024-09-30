@@ -10,17 +10,23 @@ import pymupdf
 import io
 import copy
 
-buffer  = []
-images  = []
-pdfs    = []
-currow  = 1
-wcanvas = 800
-hcanvas = 600
-himages = 300
-maxw    = 150
+buffer = []
+images = []
+pdfs   = []
+maxw   = 0
 
 root      = Tk()
-root.title("Assemble PDF")
+root.title("PDF Builder")
+wscreen   = root.winfo_screenwidth()
+hscreen   = root.winfo_screenheight()
+wcanvas   = int(wscreen / 2)
+hcanvas   = int(hscreen / 2)
+himages   = int(3 * hcanvas / 4)
+cwbutton  = 20
+button    = ttk.Button(root, width=cwbutton)
+button.pack()
+wbutton   = button.winfo_reqwidth()
+button.destroy()
 canvas    = Canvas(root, width=wcanvas, height=hcanvas)
 mainframe = ttk.Frame(canvas)
 scrollbar = ttk.Scrollbar(
@@ -36,10 +42,12 @@ canvas.pack(side="left", fill="both", expand=True)
 def update_canvas(*args):
   global wcanvas
   global hcanvas
+  global wbutton
   wcanvas = canvas.winfo_width()
   hcanvas = canvas.winfo_height()
   canvas.delete("all")
-  canvas.create_window((int((wcanvas - maxw) / 2) - 100,0), window=mainframe, anchor="nw")
+  # canvas.create_window((int((wcanvas - maxw - wbutton) / 2),0), window=mainframe, anchor="nw")
+  canvas.create_window((int((wcanvas - maxw - wbutton) / 2),0), window=mainframe, anchor="nw")
 
 
 canvas.bind("<Configure>", update_canvas)
@@ -51,7 +59,7 @@ def update_mainframe(*args):
 
 
 mainframe.bind("<Configure>", update_mainframe)
-canvas.create_window((int((wcanvas - maxw) / 2),0), window=mainframe, anchor="nw")
+# canvas.create_window((int((wcanvas - maxw - wbutton) / 2),0), window=mainframe, anchor="nw")
 parent = mainframe
 
 
@@ -94,34 +102,36 @@ def reload_mainframe():
   global mainframe
   global parent
   global maxw
-  maxw = 150
+  global wbutton
   canvas.delete("all")
   for child in parent.winfo_children():
     child.destroy()
   button_frame  = ttk.Frame(parent)
-  add_element(button_frame)
-  add_element(ttk.Button(button_frame, text="+", command=open_file))
-  add_element(ttk.Button(button_frame, text="Export", command=export))
+  button_frame.pack()
+  ttk.Button(button_frame, text="+", command=open_file, width=cwbutton).pack()
+  ttk.Button(button_frame, text="Export", command=export, width=cwbutton).pack()
   j = 0
   for img in images:
     img_frame     = ttk.Frame(parent)
     control_frame = ttk.Frame(img_frame)
-    add_element(img_frame)
-    add_element(control_frame, side="left")
-    add_element(ttk.Button(control_frame, text="Clockwise", command=lambda number=j: clockwise(number)))
-    add_element(ttk.Button(control_frame, text="Up", command=lambda number=j: page_up(number)))
-    add_element(ttk.Button(control_frame, text="Counterclockwise", command=lambda number=j: counterclockwise(number)))
-    add_element(ttk.Button(control_frame, text="Down", command=lambda number=j: page_down(number)))
+    img_frame.pack()
+    control_frame.pack(side="left")
+    ttk.Button(control_frame, text="Clockwise", command=lambda number=j: clockwise(number), width=cwbutton).pack()
+    ttk.Button(control_frame, text="Up", command=lambda number=j: page_up(number), width=cwbutton).pack()
+    ttk.Button(control_frame, text="Counterclockwise", command=lambda number=j: counterclockwise(number), width=cwbutton).pack()
+    ttk.Button(control_frame, text="Down", command=lambda number=j: page_down(number), width=cwbutton).pack()
     load_image(img, img_frame)
     j += 1
-  canvas.create_window((int((wcanvas - maxw) / 2 - 100),0), window=mainframe, anchor="nw")
+  # (wcanvas - (maxw + wbutton)) / 2
+  # canvas.create_window((int((wcanvas - maxw - wbutton) / 2),0), window=mainframe, anchor="nw")
+  canvas.create_window((int((wcanvas - maxw - wbutton) / 2),0), window=mainframe, anchor="nw")
 
 
 def load_image(img, parent):
   global maxw
   width, height = img.size
-  width         = int(300 * width / height)
-  height        = 300
+  width         = int(himages * width / height)
+  height        = himages
   if width > maxw:
     maxw = width
   img           = img.resize((width,height))
