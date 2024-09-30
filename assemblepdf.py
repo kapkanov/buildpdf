@@ -8,7 +8,7 @@ from   PIL         import ImageTk, Image
 import os
 import pymupdf
 import io
-
+import copy
 
 buffer  = []
 images  = []
@@ -54,13 +54,30 @@ canvas.create_window((int((wcanvas - maxw) / 2),0), window=mainframe, anchor="nw
 parent = mainframe
 
 
-def add_element(element):
-  element.pack()
+def add_element(element, side="top"):
+  element.pack(side=side)
+
+
+def page_up(number):
+  if number == 0:
+    return
+  images[number], images[number - 1] = images[number - 1], images[number]
+  pdfs[number], pdfs[number - 1] = pdfs[number - 1], pdfs[number]
+  reload_mainframe()
+
+
+def page_down(number):
+  if number == len(images) - 1:
+    return
+  images[number], images[number + 1] = images[number + 1], images[number]
+  pdfs[number], pdfs[number + 1] = pdfs[number + 1], pdfs[number]
+  reload_mainframe()
 
 
 def reload_mainframe():
   global canvas
   global mainframe
+  global parent
   canvas.delete("all")
   for child in parent.winfo_children():
     child.destroy()
@@ -68,12 +85,20 @@ def reload_mainframe():
   add_element(button_frame)
   add_element(ttk.Button(button_frame, text="+", command=open_file))
   add_element(ttk.Button(button_frame, text="Export", command=export))
+  j = 0
   for img in images:
-    load_image(img)
+    img_frame    = ttk.Frame(parent)
+    updown_frame = ttk.Frame(img_frame)
+    add_element(img_frame)
+    add_element(updown_frame)
+    add_element(ttk.Button(updown_frame, text="Up", command=lambda number=j: page_up(number)), side="left")
+    add_element(ttk.Button(updown_frame, text="Down", command=lambda number=j: page_down(number)), side="right")
+    load_image(img, img_frame)
+    j += 1
   canvas.create_window((int((wcanvas - maxw) / 2),0), window=mainframe, anchor="nw")
 
 
-def load_image(img):
+def load_image(img, parent):
   global maxw
   width, height = img.size
   width         = int(300 * width / height)
@@ -112,14 +137,14 @@ def split_pdf(filename):
   return pages
 
 
-def img2pdf(filename):
-    img        = Image.open(filename)
+def img2pdf(fname):
+    img        = Image.open(fname)
     wimg, himg = img.size
     doc        = pymupdf.Document()
     doc.new_page(pno=0, width=wimg, height=himg)
     rect       = pymupdf.Rect(0, 0, wimg, himg)
     page       = doc.load_page(0)
-    page.insert_image(rect, filename=filename)
+    page.insert_image(rect, filename=fname)
     return doc
 
 
