@@ -39,7 +39,8 @@ def update_canvas(*args):
   wcanvas = canvas.winfo_width()
   hcanvas = canvas.winfo_height()
   canvas.delete("all")
-  canvas.create_window((int((wcanvas - maxw) / 2),0), window=mainframe, anchor="nw")
+  canvas.create_window((int((wcanvas - maxw) / 2) - 100,0), window=mainframe, anchor="nw")
+
 
 canvas.bind("<Configure>", update_canvas)
 
@@ -103,17 +104,17 @@ def reload_mainframe():
   add_element(ttk.Button(button_frame, text="Export", command=export))
   j = 0
   for img in images:
-    img_frame    = ttk.Frame(parent)
-    updown_frame = ttk.Frame(img_frame)
+    img_frame     = ttk.Frame(parent)
+    control_frame = ttk.Frame(img_frame)
     add_element(img_frame)
-    add_element(updown_frame)
-    add_element(ttk.Button(updown_frame, text="Clockwise", command=lambda number=j: clockwise(number)), side="left")
-    add_element(ttk.Button(updown_frame, text="Up", command=lambda number=j: page_up(number)), side="left")
-    add_element(ttk.Button(updown_frame, text="Counterclockwise", command=lambda number=j: counterclockwise(number)), side="right")
-    add_element(ttk.Button(updown_frame, text="Down", command=lambda number=j: page_down(number)), side="right")
+    add_element(control_frame, side="left")
+    add_element(ttk.Button(control_frame, text="Clockwise", command=lambda number=j: clockwise(number)))
+    add_element(ttk.Button(control_frame, text="Up", command=lambda number=j: page_up(number)))
+    add_element(ttk.Button(control_frame, text="Counterclockwise", command=lambda number=j: counterclockwise(number)))
+    add_element(ttk.Button(control_frame, text="Down", command=lambda number=j: page_down(number)))
     load_image(img, img_frame)
     j += 1
-  canvas.create_window((int((wcanvas - maxw) / 2),0), window=mainframe, anchor="nw")
+  canvas.create_window((int((wcanvas - maxw) / 2 - 100),0), window=mainframe, anchor="nw")
 
 
 def load_image(img, parent):
