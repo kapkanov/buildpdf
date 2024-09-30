@@ -46,8 +46,7 @@ def update_canvas(*args):
   wcanvas = canvas.winfo_width()
   hcanvas = canvas.winfo_height()
   canvas.delete("all")
-  # canvas.create_window((int((wcanvas - maxw - wbutton) / 2),0), window=mainframe, anchor="nw")
-  canvas.create_window((int((wcanvas - maxw - wbutton) / 2),0), window=mainframe, anchor="nw")
+  canvas.create_window((int((wcanvas - maxw) / 2 - wbutton),0), window=mainframe, anchor="nw")
 
 
 canvas.bind("<Configure>", update_canvas)
@@ -108,8 +107,8 @@ def reload_mainframe():
     child.destroy()
   button_frame  = ttk.Frame(parent)
   button_frame.pack()
-  ttk.Button(button_frame, text="+", command=open_file, width=cwbutton).pack()
-  ttk.Button(button_frame, text="Export", command=export, width=cwbutton).pack()
+  ttk.Button(button_frame, text="Open File", command=open_file, width=cwbutton).pack(side="left")
+  ttk.Button(button_frame, text="Export", command=export, width=cwbutton).pack(side="left")
   j = 0
   for img in images:
     img_frame     = ttk.Frame(parent)
@@ -124,7 +123,7 @@ def reload_mainframe():
     j += 1
   # (wcanvas - (maxw + wbutton)) / 2
   # canvas.create_window((int((wcanvas - maxw - wbutton) / 2),0), window=mainframe, anchor="nw")
-  canvas.create_window((int((wcanvas - maxw - wbutton) / 2),0), window=mainframe, anchor="nw")
+  canvas.create_window((int((wcanvas - maxw) / 2 - wbutton),0), window=mainframe, anchor="nw")
 
 
 def load_image(img, parent):
@@ -138,7 +137,7 @@ def load_image(img, parent):
   imgtk         = ImageTk.PhotoImage(img)
   panel         = ttk.Label(parent, image=imgtk)
   panel.image   = imgtk
-  add_element(panel)
+  panel.pack()
 
 
 def pdf2img(filename):
