@@ -74,10 +74,26 @@ def page_down(number):
   reload_mainframe()
 
 
+def clockwise(number):
+  page           = pdfs[number].load_page(0)
+  page.set_rotation(page.rotation + 90)
+  images[number] = images[number].transpose(Image.ROTATE_270)
+  reload_mainframe()
+
+
+def counterclockwise(number):
+  page           = pdfs[number].load_page(0)
+  page.set_rotation(page.rotation - 90)
+  images[number] = images[number].transpose(Image.ROTATE_90)
+  reload_mainframe()
+
+
 def reload_mainframe():
   global canvas
   global mainframe
   global parent
+  global maxw
+  maxw = 150
   canvas.delete("all")
   for child in parent.winfo_children():
     child.destroy()
@@ -91,7 +107,9 @@ def reload_mainframe():
     updown_frame = ttk.Frame(img_frame)
     add_element(img_frame)
     add_element(updown_frame)
+    add_element(ttk.Button(updown_frame, text="Clockwise", command=lambda number=j: clockwise(number)), side="left")
     add_element(ttk.Button(updown_frame, text="Up", command=lambda number=j: page_up(number)), side="left")
+    add_element(ttk.Button(updown_frame, text="Counterclockwise", command=lambda number=j: counterclockwise(number)), side="right")
     add_element(ttk.Button(updown_frame, text="Down", command=lambda number=j: page_down(number)), side="right")
     load_image(img, img_frame)
     j += 1
