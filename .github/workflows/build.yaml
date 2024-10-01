@@ -9,6 +9,8 @@ jobs:
     env:
       GH_TOKEN: ${{ github.token }}
     steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
     - name: Create Release
       run: gh release create ${{ github.ref_name }}
   build_win:
