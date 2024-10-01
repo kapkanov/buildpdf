@@ -33,10 +33,10 @@ jobs:
     - name: Install PyInstaller
       run: pip install pyinstaller==6.10.0
     - name: Build executable
-      run: pyinstaller --onefile --hide-console hide-early buildpdf.py
+      run: pyinstaller --onefile buildpdf.py
     - name: Upload Executable
       run: |
-        cp dist/buildpdf.exe buildpdf_win.exe
+        copy dist/buildpdf.exe buildpdf_win.exe
         gh release upload ${{ github.ref_name }} buildpdf_win.exe
   build_linux:
     runs-on: ["ubuntu-20.04"]
