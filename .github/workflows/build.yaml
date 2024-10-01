@@ -35,7 +35,7 @@ jobs:
     - name: Install PyInstaller
       run: pip install pyinstaller==6.10.0
     - name: Build executable
-      run: pyinstaller --icon logo.ico --onefile --hide-console hide-early buildpdf.py
+      run: pyinstaller --noconsole --icon logo.ico --onefile --hide-console hide-early buildpdf.py
     - name: Upload Executable
       run: |
         copy dist/buildpdf.exe buildpdf_win.exe
