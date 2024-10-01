@@ -1,5 +1,3 @@
-# requirements.txt
-# pymupdf
 import copy
 from   tkinter     import *
 from   tkinter     import ttk
@@ -8,7 +6,6 @@ from   PIL         import ImageTk, Image
 import os
 import pymupdf
 import io
-import copy
 
 buffer = []
 images = []
@@ -70,7 +67,7 @@ def page_up(number):
   if number == 0:
     return
   images[number], images[number - 1] = images[number - 1], images[number]
-  pdfs[number], pdfs[number - 1] = pdfs[number - 1], pdfs[number]
+  pdfs[number],   pdfs[number - 1]   = pdfs[number - 1],   pdfs[number]
   reload_mainframe()
 
 
@@ -78,7 +75,7 @@ def page_down(number):
   if number == len(images) - 1:
     return
   images[number], images[number + 1] = images[number + 1], images[number]
-  pdfs[number], pdfs[number + 1] = pdfs[number + 1], pdfs[number]
+  pdfs[number],   pdfs[number + 1]   = pdfs[number + 1],   pdfs[number]
   reload_mainframe()
 
 
@@ -93,6 +90,14 @@ def counterclockwise(number):
   page           = pdfs[number].load_page(0)
   page.set_rotation(page.rotation - 90)
   images[number] = images[number].transpose(Image.ROTATE_90)
+  reload_mainframe()
+
+
+def remove_page(number):
+  global images
+  global pdfs
+  del    images[number]
+  del    pdfs[number]
   reload_mainframe()
 
 
@@ -119,6 +124,7 @@ def reload_mainframe():
     ttk.Button(control_frame, text="Up", command=lambda number=j: page_up(number), width=cwbutton).pack()
     ttk.Button(control_frame, text="Down", command=lambda number=j: page_down(number), width=cwbutton).pack()
     ttk.Button(control_frame, text="Counterclockwise", command=lambda number=j: counterclockwise(number), width=cwbutton).pack()
+    ttk.Button(control_frame, text="Remove", command=lambda number=j: remove_page(number), width=cwbutton).pack()
     load_image(img, img_frame)
     j += 1
   # (wcanvas - (maxw + wbutton)) / 2
