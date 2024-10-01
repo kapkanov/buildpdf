@@ -1,0 +1,91 @@
+on:
+  push:
+    tags:
+    - "**"
+
+jobs:
+  create_release:
+    runs-on: ["ubuntu-20.04"]
+    steps:
+    - name: Create Release
+      run: gh release create ${{ github.ref_name }}
+  build_win:
+    runs-on: ["windows-2019"]
+    needs: create_release
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+    - name: Install Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.12.3'
+    - name: Install PyMuPDF
+      run: pip install pymupdf==1.24.10
+    - name: Install PyInstaller
+      run: pip install pyinstaller==6.10.0
+    - name: Build executable
+      run: pyinstaller --onefile --hide-console hide-early buildpdf.py
+    - name: Upload Executable
+      run: |
+        cp dist/buildpdf.exe buildpdf_win.exe
+        gh release upload ${{ github.ref_name }} buildpdf_win.exe
+  build_linux:
+    runs-on: ["ubuntu-20.04"]
+    needs: create_release
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+    - name: Install Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.12.3'
+    - name: Install PyMuPDF
+      run: pip install pymupdf==1.24.10
+    - name: Install PyInstaller
+      run: pip install pyinstaller==6.10.0
+    - name: Build executable
+      run: pyinstaller --onefile buildpdf.py
+    - name: Upload Executable
+      run: |
+        cp dist/* buildpdf_linux
+        gh release upload ${{ github.ref_name }} buildpdf_linux
+  build_macos:
+    runs-on: ["macos-12"]
+    needs: create_release
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+    - name: Install Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.12.3'
+    - name: Install PyMuPDF
+      run: pip install pymupdf==1.24.10
+    - name: Install PyInstaller
+      run: pip install pyinstaller==6.10.0
+    - name: Build executable
+      run: pyinstaller --onefile buildpdf.py
+    - name: Upload Executable
+      run: |
+        cp dist/* buildpdf_macos
+        gh release upload ${{ github.ref_name }} buildpdf_macos
+  build_macos_m1:
+    runs-on: ["macos-14"]
+    needs: create_release
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+    - name: Install Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.12.3'
+    - name: Install PyMuPDF
+      run: pip install pymupdf==1.24.10
+    - name: Install PyInstaller
+      run: pip install pyinstaller==6.10.0
+    - name: Build executable
+      run: pyinstaller --onefile buildpdf.py
+    - name: Upload Executable
+      run: |
+        cp dist/* buildpdf_macos_m1
+        gh release upload ${{ github.ref_name }} buildpdf_macos_m1
