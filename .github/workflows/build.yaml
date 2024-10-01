@@ -6,12 +6,16 @@ on:
 jobs:
   create_release:
     runs-on: ["ubuntu-20.04"]
+    env:
+      GH_TOKEN: ${{ github.token }}
     steps:
     - name: Create Release
       run: gh release create ${{ github.ref_name }}
   build_win:
     runs-on: ["windows-2019"]
     needs: create_release
+    env:
+      GH_TOKEN: ${{ github.token }}
     steps:
     - name: Checkout repository
       uses: actions/checkout@v4
@@ -32,6 +36,8 @@ jobs:
   build_linux:
     runs-on: ["ubuntu-20.04"]
     needs: create_release
+    env:
+      GH_TOKEN: ${{ github.token }}
     steps:
     - name: Checkout repository
       uses: actions/checkout@v4
@@ -52,6 +58,8 @@ jobs:
   build_macos:
     runs-on: ["macos-12"]
     needs: create_release
+    env:
+      GH_TOKEN: ${{ github.token }}
     steps:
     - name: Checkout repository
       uses: actions/checkout@v4
@@ -72,6 +80,8 @@ jobs:
   build_macos_m1:
     runs-on: ["macos-14"]
     needs: create_release
+    env:
+      GH_TOKEN: ${{ github.token }}
     steps:
     - name: Checkout repository
       uses: actions/checkout@v4
