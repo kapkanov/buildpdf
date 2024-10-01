@@ -14,7 +14,6 @@ maxw   = 0
 
 root      = Tk()
 root.title("PDF Builder")
-root.iconbitmap("logo.ico")
 wscreen   = root.winfo_screenwidth()
 hscreen   = root.winfo_screenheight()
 wcanvas   = int(wscreen / 2)
