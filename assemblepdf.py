@@ -117,8 +117,8 @@ def reload_mainframe():
     control_frame.pack(side="left")
     ttk.Button(control_frame, text="Clockwise", command=lambda number=j: clockwise(number), width=cwbutton).pack()
     ttk.Button(control_frame, text="Up", command=lambda number=j: page_up(number), width=cwbutton).pack()
-    ttk.Button(control_frame, text="Counterclockwise", command=lambda number=j: counterclockwise(number), width=cwbutton).pack()
     ttk.Button(control_frame, text="Down", command=lambda number=j: page_down(number), width=cwbutton).pack()
+    ttk.Button(control_frame, text="Counterclockwise", command=lambda number=j: counterclockwise(number), width=cwbutton).pack()
     load_image(img, img_frame)
     j += 1
   # (wcanvas - (maxw + wbutton)) / 2
