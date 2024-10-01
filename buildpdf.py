@@ -46,7 +46,13 @@ def update_canvas(*args):
   canvas.create_window((int((wcanvas - maxw) / 2 - wbutton),0), window=mainframe, anchor="nw")
 
 
+def mousewheel(event):
+  global canvas
+  canvas.yview_scroll(int(-1 * (event.delta / 120)), "units")
+
+
 canvas.bind("<Configure>", update_canvas)
+canvas.bind_all("<MouseWheel>", mousewheel)
 
 
 def update_mainframe(*args):
