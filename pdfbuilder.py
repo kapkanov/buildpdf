@@ -34,7 +34,6 @@ scrollbar = ttk.Scrollbar(
             )
 canvas.configure(yscrollcommand=scrollbar.set)
 scrollbar.pack(side="right", fill="y")
-canvas.pack(side="left", fill="both", expand=True)
 
 
 def update_canvas(*args):
@@ -117,10 +116,10 @@ def reload_mainframe():
   canvas.delete("all")
   for child in parent.winfo_children():
     child.destroy()
-  button_frame  = ttk.Frame(parent)
-  button_frame.pack()
-  ttk.Button(button_frame, text="Open File", command=open_file, width=cwbutton).pack(side="left")
-  ttk.Button(button_frame, text="Export", command=export, width=cwbutton).pack(side="left")
+  # button_frame  = ttk.Frame(root)
+  # button_frame.pack()
+  # ttk.Button(button_frame, text="Open File", command=open_file, width=cwbutton).pack(side="left")
+  # ttk.Button(button_frame, text="Export", command=export, width=cwbutton).pack(side="left")
   j = 0
   for img in images:
     img_frame     = ttk.Frame(parent)
@@ -220,6 +219,12 @@ def export(*args):
   for page in pdfs:
     doc.insert_pdf(page)
   doc.save(filename)
+
+button_frame  = ttk.Frame(root)
+ttk.Button(button_frame, text="Open File", command=open_file, width=cwbutton).pack(side="left")
+ttk.Button(button_frame, text="Export", command=export, width=cwbutton).pack(side="left")
+button_frame.pack()
+canvas.pack(side="left", fill="both", expand=True)
 
 reload_mainframe()
 
