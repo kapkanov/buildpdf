@@ -2,6 +2,7 @@ import copy
 from   tkinter     import *
 from   tkinter     import ttk
 from   tkinter     import filedialog
+from   tkinter     import messagebox
 from   PIL         import ImageTk, Image
 import os
 import pymupdf
@@ -193,7 +194,7 @@ def open_file():
   global pdfs
   filename = filedialog.askopenfilename(
     title="Open file",
-    initialdir=os.path.dirname(os.path.realpath(__file__)),
+    initialdir="/",
     filetypes=[("All files", "*.*")]
   )
   _, extension = os.path.splitext(filename)
@@ -208,7 +209,8 @@ def open_file():
     images.append(Image.open(filename))
     pdfs.append(img2pdf(filename))
   else:
-    ttk.Label(parent, text=f"Garbage! {extension}").pack()
+    messagebox.showinfo(title="Error", message="Only .pdf, .jpg, .png, .gif, .bmp files are supported")
+    # ttk.Label(parent, text=f"Garbage! {extension}").pack()
   reload_mainframe()
 
 
